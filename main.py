@@ -16,6 +16,9 @@ class RegistrationRequest(BaseModel):
     phone: str
     password: str
 
+class LoginRequest(BaseModel):
+    email: str
+    password: str
 
 users: list[User] = [
     User(name="A", email="B", phone="C", password="D"),
@@ -23,9 +26,13 @@ users: list[User] = [
 ]
 
 
-@app.post("/users/auth/registration/")
+@app.post("/auth/registration/")
 def register_user(reg_req: RegistrationRequest) -> str:
     if reg_req in users:
         raise fastapi.HTTPException(status_code=409, detail=f'User with name {reg_req.name} already exists')
     users.append(reg_req)
     return "User Created!"
+
+@app.post("/auth/login/")
+def login_user(log_req: LoginRequest) -> str:
+    return "Login Successful!"
