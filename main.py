@@ -15,7 +15,7 @@ users: list[User] = [
     User(name="A", email="B", phone="C", password="D"),
     User(name="a", email="b", phone="c", password="d"),
 ]
-
+auth/registration RegRequest RegResponse
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
@@ -24,9 +24,14 @@ def read_root():
 def get_user(name: str) -> User:
     for user in users:
         if user.name == name:
-            return {"name": user.name,
-                    "Email": user.email,
-                    "Phone": user.phone,
-                    }
+            return user
 
     raise fastapi.HTTPException(status_code=404, detail=f"User not found for name {name}")
+
+
+@app.post("/users/")
+def create_user(user: User) -> User:
+    if user in users:
+        raise fastapi.HTTPException(status_code=409, detail=f'User with name {user.name} already exists')
+    users.append(user)
+    return user
