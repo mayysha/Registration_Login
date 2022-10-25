@@ -1,16 +1,38 @@
-# This is a sample Python script.
+import fastapi
+from fastapi import FastAPI
+from pydantic import BaseModel
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
+app = FastAPI()
+
+class User(BaseModel):
+    name: str
+    email: str
+    phone: str
+    password: str
+
+class RegistrationRequest(BaseModel):
+    name: str
+    email: str
+    phone: str
+    password: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+users: list[User] = [
+    User(name="A", email="B", phone="C", password="D"),
+    User(name="a", email="b", phone="c", password="d"),
+]
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
+@app.post("/auth/registration/")
+def register_user(reg_req: RegistrationRequest) -> str:
+    if reg_req in users:
+        raise fastapi.HTTPException(status_code=409, detail=f'User with name {reg_req.name} already exists')
+    users.append(reg_req)
+    return "User Created!"
 
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+@app.post("/auth/login/")
+def login_user(log_req: LoginRequest) -> str:
+    return "Login Successful!"
